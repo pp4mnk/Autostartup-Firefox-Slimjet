@@ -1,0 +1,47 @@
+#!/bin/sh
+#
+# Launcher for 'portable' Slimjet browser
+#
+HERE="$(dirname "$(readlink -f "$0")")"
+#
+mkdir -p "$HERE/spot/PROFILE" 2> /dev/null
+ln -s $HERE/spot/PROFILE $HERE/slimjet/PROFILE
+#
+if [ ! -f "$HERE/DATA/spot.txt" ]
+then
+	chown -R root:root $HERE/spot
+	chown -R root:root $HERE/LIB
+	chown -R root:root $HERE/slimjet
+	if  grep -q 'puppy_tahr64' /etc/os-release
+	then
+		LD_LIBRARY_PATH=$HERE/:$HERE/LIB${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+		"$HERE/slimjet/flashpeak-slimjet" --test-type "$@"
+	elif  grep -q 'puppy_xenialpup64' /etc/os-release
+	then
+		LD_LIBRARY_PATH=$HERE/:$HERE/LIB${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+		"$HERE/slimjet/flashpeak-slimjet" --test-type "$@"
+	else
+		"$HERE/slimjet/flashpeak-slimjet" --test-type "$@"
+	fi
+fi
+#
+if [ -f "$HERE/DATA/spot.txt" ]
+then
+	chown -R spot:spot $HERE/spot
+	chown -R spot:spot $HERE/LIB
+	chown -R spot:spot $HERE/slimjet
+	if  grep -q 'puppy_tahr64' /etc/os-release
+	then
+		LD_LIBRARY_PATH=$HERE/:$HERE/LIB${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+		run-as-spot "$HERE/slimjet/flashpeak-slimjet" --test-type "$@"
+	elif  grep -q 'puppy_xenialpup64' /etc/os-release
+	then
+		LD_LIBRARY_PATH=$HERE/:$HERE/LIB${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+		run-as-spot "$HERE/slimjet/flashpeak-slimjet" --test-type "$@"
+	else
+		run-as-spot "$HERE/slimjet/flashpeak-slimjet" --test-type "$@"
+	fi
+fi
+rm -rf $HERE/DATA/spot.txt
+rm -rf $HERE/slimjet/spot.txt
+rm -rf $HERE/slimjet/PROFILE
